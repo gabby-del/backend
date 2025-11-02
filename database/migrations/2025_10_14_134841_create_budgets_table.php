@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,14 +12,23 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("department_id");
-            $table->foreignId("project_id");
-            $table->string("budget_type");
-            $table->string("fiscal_year");
-            $table->decimal("total_amount");
-            $table->decimal("allocated_amount");
-            $table->decimal("spent_amount");
-            $table->decimal("available_amount");
+            $table->string('name')->unique();
+            
+            // 🟢 Link to the structural entity
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            
+            
+            // Financial tracking fields
+            $table->decimal('amount_allocated', 15, 2);
+            $table->decimal('amount_spent', 15, 2)->default(0);
+
+            // 🟢 ADDED: Status for the workflow (Pending/Active/Archived)
+            $table->enum('status', ['Draft', 'Pending', 'Active', 'Archived'])->default('Draft');
+            
+            // Categorization
+            $table->enum('category', ['OPEX', 'CAPEX', 'PROJECT']);
+            
+            $table->year('year');
             $table->timestamps();
         });
     }

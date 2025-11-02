@@ -13,20 +13,32 @@ return new class extends Migration
     {
         Schema::create('payment_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("requester_id");
-            $table->foreignId("department_id");
-            $table->foreignId("project_id");
-            $table->foreignId("cost_center_id");
-            $table->string("title");
-            $table->string("description");
-            $table->decimal("amount");
-            $table->string("vendor_name");
-            $table->string("vendor_details");
-            $table->string("expense_category");
-            $table->string("status");
-            $table->timestamp("submitted_at");
-            $table->timestamp("approved_at");
-            $table->timestamp("paid_at");
+
+            // 🟢 ESSENTIAL: Links the request to the User who created it.
+            // (Regardless of whether that user is a CEO, FM, or FO).
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // 🟢 FOREIGN KEYS (Constrained)
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            $table->foreignId('project_id')->nullable()->constrained()->onDelete('set null');
+            
+         
+            
+            $table->string('title');
+            $table->text('description');
+            $table->decimal('amount', 15, 2);
+            $table->string('vendor_name');
+            $table->text('vendor_details');
+            $table->string('expense_category');
+
+            // Workflow Status
+            $table->enum('status', ['draft', 'pending', 'approved', 'rejected', 'paid'])->default('draft');
+            $table->text('rejection_reason')->nullable();
+            
+            // Timestamp tracking
+            $table->timestamp('submitted_at')->nullable();
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
     }

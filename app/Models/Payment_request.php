@@ -2,26 +2,36 @@
 
 namespace App\Models;
 
+// app/Models/PaymentRequest.php
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Payment_request extends Model
+class PaymentRequest extends Model
 {
-    use HasFactory;
-    protected $table = 'payment_requests';
-    protected $fillable = [
-        'requester_id',
-        'amount',
-        'currency',
-        'cost_center_id',
-        'budget_id',
-        'description',
-        'status',
-        'approved_by',
-        'approved_at',
-        'rejected_by',
-        'rejected_at',
-        'rejection_reason',
-    ];
+    protected $guarded = ['id'];
+
+    protected $casts = ['vendor_details' => 'json']; // Automatically converts JSON string to PHP array/object
+
+    // The request belongs to these entities
+    public function requester(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'requester_id');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    // Documents associated with the request [cite: 30]
+    public function documents(): HasMany
+    {
+        return $this->hasMany(PaymentRequestDoc::class);
+    }
 }

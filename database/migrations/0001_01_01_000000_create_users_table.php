@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,30 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('cost_center_id');
-            $table->rememberToken();
-            $table->string('email_verification_at');
-            $table->timestamps();
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
-};
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
             $table->string('password');
-            $table->foreignId('role_id')->constrained('roles');
-            $table->foreignId('department_id')->constrained('departments');
+
+            // Foreign keys (ensure roles and departments tables exist BEFORE running this)
+            $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('set null');
+            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
+
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
@@ -51,6 +32,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Explicitly drop foreign key constraints first 
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('role_id');
+            $table->dropConstrainedForeignId('department_id');
+        });
+
         Schema::dropIfExists('users');
     }
 };

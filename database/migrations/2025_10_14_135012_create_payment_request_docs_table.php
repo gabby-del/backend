@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('payment_request_docs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("payment_request_id");
-            $table->string("file_name");
-            $table->string("file_path");
-            $table->integer("file_size");
-            $table->timestamp("uploaded_at");
+            // $table->foreignId('payment_request_id');
+            $table->string('file_name');
+            $table->string('file_path');
+            $table->integer('file_size');
+            $table->timestamp('uploaded_at');
             $table->timestamps();
         });
     }
